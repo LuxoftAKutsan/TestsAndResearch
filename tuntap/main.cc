@@ -20,6 +20,7 @@
 #include <ifaddrs.h>
 #include <linux/fib_rules.h>
 #include <glib.h>
+#include <errno.h>
 
 int connman_inet_create_tunnel(char **iface)
 {
@@ -50,12 +51,35 @@ int connman_inet_create_tunnel(char **iface)
 	}
 
 	*iface = g_strdup(ifr.ifr_name);
+//	*iface = ifr.ifr_name;
 	return fd;
 }
 
 int main() {
 	char* iface;
-	int d = connman_inet_create_tunnel(&iface);
-	printf("iface = %s fd = %d\n", iface, d);
+	if (fork()) {
+		int d = connman_inet_create_tunnel(&iface);
+		printf("iface = %s fd = %d\n", iface, d);
+		printf("Alice work\n");
+		const char * msg_to_send = "Hello BOB";
+		int n = write(d, msg_to_send, sizeof(msg_to_send)/sizeof(char));
+		printf("ALice send %s %d \n", msg_to_send, n);
+		char * msg_to_receive = static_cast<char*>(malloc(100));
+		read(d, msg_to_receive, 5);
+		printf("Alice receive : %s \n", msg_to_receive);
+		close(d);
+	} else  {
+		sleep(1);
+		int d = open("/dev/net/tun", O_RDWR | O_CLOEXEC);
+		if (d < 0) { printf("ERROR %d \n", errno); }
+		printf("Bob work\n");
+		char * msg_to_receive = static_cast<char*>(malloc(100));
+		int n = read(d, msg_to_receive, 5);
+		printf("Bob receive : %s %d \n", msg_to_receive, n);
+		const  char * msg_to_send = "Hello Alice";
+		write(d, msg_to_send, sizeof(msg_to_send)/sizeof(char));
+		printf("Bob send %s\n", msg_to_send);
+		close(d);
+	}
 	pause();
 }
