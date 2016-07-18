@@ -11,7 +11,7 @@
 
 
 static const std::string string_to_fill = "Find leaks in this fucking SDL!";
-static size_t count_of_strings = 1000000u;
+static size_t count_of_strings = 10000000u;
 static size_t time_to_sleep = 1000000; // microseconds
 
 void list_test() {
@@ -28,6 +28,26 @@ void list_test() {
 	fill_container(l, creator, count_of_strings);
 	print_memory_usage();
 	free_container(l);
+	print_memory_usage();
+	print_memory_usage();
+	any_key();
+}
+
+void deque_test() {
+	std::cout << "Deque Test" << std::endl;
+	std::deque<std::string> q;
+	print_memory_usage();
+	auto creator = [](){return string_to_fill;};
+	fill_container(q, creator, count_of_strings);
+	print_memory_usage();
+	free_container(q);
+	print_memory_usage();
+	usleep(time_to_sleep);
+	print_memory_usage();
+	std::cout << "Fill secondary" << std::endl;
+	fill_container(q, creator, count_of_strings);
+	print_memory_usage();
+	free_container(q);
 	print_memory_usage();
 	print_memory_usage();
 	any_key();
@@ -72,10 +92,25 @@ void vector_test() {
 	any_key();
 }
 
+void raw_test() {
+	std::cout << "Raw test" << std::endl;
+	std::string* data = new std::string[count_of_strings];
+	for (size_t i = 0; i < count_of_strings; ++i) {
+		data[i] = string_to_fill;
+	}
+	print_memory_usage();
+	delete[] data;
+	print_memory_usage();
+	any_key();
+}
+
 
 int main() {
+	raw_test();
 	list_test();
-	queue_test();
 	vector_test();
+	queue_test();
+	deque_test();
 	return 0;
 }
+
