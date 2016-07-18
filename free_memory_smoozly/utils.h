@@ -1,6 +1,13 @@
 #include <iostream>
 #include <functional>
 
+
+template<class T>
+void free_with_swap(T& v) {
+	T t;
+	std::swap(t, v);
+}
+
 void print_memory_usage() {
    std::cout << "Memory usage : " << mem_usage::rss() / 1000 << " Mb." << std::endl;
 }

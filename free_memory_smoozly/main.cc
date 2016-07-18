@@ -41,15 +41,29 @@ void deque_test() {
 	fill_container(q, creator, count_of_strings);
 	print_memory_usage();
 	free_container(q);
-	print_memory_usage();
 	usleep(time_to_sleep);
 	print_memory_usage();
+	print_memory_usage();
+
 	std::cout << "Fill secondary" << std::endl;
 	fill_container(q, creator, count_of_strings);
 	print_memory_usage();
-	free_container(q);
+	free_with_swap(q);
+	std::cout << "Queue freed with swap " << q.size() << std::endl;
 	print_memory_usage();
+	usleep(time_to_sleep);
 	print_memory_usage();
+
+	std::cout << "Fill thirt time" << std::endl;
+	fill_container(q, creator, count_of_strings);
+	print_memory_usage();
+	q.resize(0);
+	std::cout << "Queue freed with resize " << q.size() << std::endl;
+	print_memory_usage();
+	usleep(time_to_sleep);
+	print_memory_usage();
+
+
 	any_key();
 }
 
@@ -62,15 +76,51 @@ void queue_test() {
 	print_memory_usage();
 	free_container(q, &std::queue<std::string>::pop);
 	print_memory_usage();
-	usleep(time_to_sleep);
+	std::cout << "Queue freed with swap" << std::endl;
 	print_memory_usage();
+	free_with_swap(q);
 	std::cout << "Fill secondary" << std::endl;
 	fill_container(q, creator, count_of_strings, &std::queue<std::string>::push);
 	print_memory_usage();
 	free_container(q, &std::queue<std::string>::pop);
 	print_memory_usage();
-	print_memory_usage();
 	any_key();
+}
+
+class ComplicatedObject {
+	int index_;
+	int * data_;
+	public:
+	ComplicatedObject(int index):index_(index) {
+		std::cout << "Create complicated object " << index << std::endl;
+		data_ = new int[count_of_strings * 400];
+	}
+	ComplicatedObject(const ComplicatedObject& other):
+		index_(other.index_) {
+		data_ = new int[count_of_strings * 400];
+		}
+
+	~ComplicatedObject() {
+		std::cout << "Delete complicated object " << index_ << std::endl;
+		delete[] data_;
+	}
+};
+
+void queue_of_complicated_object() {
+	std::cout << "Queue of complicated objects test";
+	std::queue<ComplicatedObject> q;
+	print_memory_usage();
+	auto creator = [](){
+		static int  i = 0;
+		return ComplicatedObject(i++);
+	};
+	fill_container(q, creator, 5, &std::queue<ComplicatedObject>::push);
+	print_memory_usage();
+	free_container(q, &std::queue<ComplicatedObject>::pop);
+	print_memory_usage();
+	usleep(time_to_sleep);
+	print_memory_usage();
+	std::cout << "Finish test" << std::endl;
 }
 
 void vector_test() {
@@ -82,11 +132,17 @@ void vector_test() {
 	print_memory_usage();
 	free_container(v);
 	print_memory_usage();
-	usleep(time_to_sleep);
+	print_memory_usage();
+	v.shrink_to_fit();
+	std::cout << "Vector shrinked" << std::endl;
 	print_memory_usage();
 	fill_container(v, creator, count_of_strings);
 	print_memory_usage();
 	free_container(v);
+	print_memory_usage();
+	print_memory_usage();
+	free_with_swap(v);
+	std::cout << "Vector swaped with empty" << std::endl;
 	print_memory_usage();
 	print_memory_usage();
 	any_key();
@@ -106,11 +162,7 @@ void raw_test() {
 
 
 int main() {
-	raw_test();
-	list_test();
-	vector_test();
-	queue_test();
-	deque_test();
+	queue_of_complicated_object();
 	return 0;
 }
 
