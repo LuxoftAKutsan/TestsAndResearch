@@ -11,58 +11,75 @@
 
 
 static const std::string string_to_fill = "Find leaks in this fucking SDL!";
-static size_t count_of_strings = 10000000u;
+static size_t count_of_strings = 60000000u;
 static size_t time_to_sleep = 1000000; // microseconds
+
+void measure_mem_twice() {
+	print_memory_usage();
+	std::cout << "Measure memory secondary" << std::endl;
+	print_memory_usage();
+}
 
 void list_test() {
 	std::cout << "List Test" << std::endl;
 	std::list<std::string> l;
 	print_memory_usage();
 	auto creator = [](){return string_to_fill;};
+
 	fill_container(l, creator, count_of_strings);
 	print_memory_usage();
+
 	free_container(l);
-	print_memory_usage();
-	print_memory_usage();
-	std::cout << "Fill secondary" << std::endl;
+	measure_mem_twice();
+	
+	std::cout << "Fill List secondary" << std::endl;
 	fill_container(l, creator, count_of_strings);
 	print_memory_usage();
-	free_container(l);
+
+	free_with_swap(l);
+	measure_mem_twice();
+
+	std::cout << "Fill List third time" << std::endl;
+	fill_container(l, creator, count_of_strings);
 	print_memory_usage();
-	print_memory_usage();
+
+	l.resize(0);
+	std::cout << "List resized to " << l.size() << std::endl;
+	
+	measure_mem_twice();
+
 	any_key();
 }
 
 void deque_test() {
 	std::cout << "Deque Test" << std::endl;
 	std::deque<std::string> q;
-	print_memory_usage();
 	auto creator = [](){return string_to_fill;};
+
+	print_memory_usage();
 	fill_container(q, creator, count_of_strings);
 	print_memory_usage();
+	
 	free_container(q);
-	usleep(time_to_sleep);
-	print_memory_usage();
-	print_memory_usage();
+	measure_mem_twice();
+
 
 	std::cout << "Fill secondary" << std::endl;
 	fill_container(q, creator, count_of_strings);
 	print_memory_usage();
+
+
 	free_with_swap(q);
-	std::cout << "Queue freed with swap " << q.size() << std::endl;
-	print_memory_usage();
-	usleep(time_to_sleep);
-	print_memory_usage();
+	measure_mem_twice();
 
 	std::cout << "Fill thirt time" << std::endl;
 	fill_container(q, creator, count_of_strings);
 	print_memory_usage();
+
+
 	q.resize(0);
 	std::cout << "Queue freed with resize " << q.size() << std::endl;
-	print_memory_usage();
-	usleep(time_to_sleep);
-	print_memory_usage();
-
+	measure_mem_twice();
 
 	any_key();
 }
@@ -162,7 +179,8 @@ void raw_test() {
 
 
 int main() {
-	queue_of_complicated_object();
+	list_test();
+	deque_test();
 	return 0;
 }
 

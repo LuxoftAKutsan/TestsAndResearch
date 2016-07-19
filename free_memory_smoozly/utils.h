@@ -1,11 +1,12 @@
 #include <iostream>
 #include <functional>
-
+#include "memory_usage.h"
 
 template<class T>
 void free_with_swap(T& v) {
 	T t;
 	std::swap(t, v);
+	std::cout << "Freed with swap. size = " << v.size() << std::endl;
 }
 
 void print_memory_usage() {
@@ -38,7 +39,7 @@ void free_container(Container& container,
 void any_key() {
 	std::cout << std::endl;
 	std::cout << std::endl;
-	// getchar();
+	getchar();
 }
 
 
