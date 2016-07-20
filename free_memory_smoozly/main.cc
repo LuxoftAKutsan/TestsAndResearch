@@ -171,6 +171,7 @@ void queue_of_complicated_object() {
   print_memory_usage();
 
   free_container(q, &std::queue<ComplicatedObject>::pop);
+  assert(counter == 0);
   measure_mem_twice();
 
   fill_container(q, creator, count_of_strings, &std::queue<ComplicatedObject>::push);
@@ -178,18 +179,17 @@ void queue_of_complicated_object() {
   print_memory_usage();
 
   free_with_swap(q);
-  assert(counter == count_of_strings);
-  measure_mem_twice();
   assert(counter == 0);
+  measure_mem_twice();
   std::cout << "Finish queue_of_complicated_object" << std::endl;
 }
 
 int main() {
-  vector_test();
-  list_test();
-  deque_test();
-  queue_test();
-  raw_test();
+  // vector_test();
+  // list_test();
+  // deque_test();
+  // queue_test();
+  // raw_test();
   queue_of_complicated_object();
   return 0;
 }
