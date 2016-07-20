@@ -185,11 +185,11 @@ void queue_of_complicated_object() {
 }
 
 int main() {
-  // vector_test();
-  // list_test();
-  // deque_test();
-  // queue_test();
-  // raw_test();
+  vector_test();
+  list_test();
+  deque_test();
+  queue_test();
+  raw_test();
   queue_of_complicated_object();
   return 0;
 }
